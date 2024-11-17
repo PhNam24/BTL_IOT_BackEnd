@@ -1,4 +1,5 @@
 const db = require('../config/db/mysql');
+const mqttClient = require('../config/mqtt/mqtt').client;
 
 class SensorController {
     getAllSensors(req, res) {
@@ -16,70 +17,62 @@ class SensorController {
         }     
     }
 
-    turnOnSensor(req, res) {
+    turnOnSensor(sensorId, callback) {
         try {
-            let id = req.params.id;
             const query = 'UPDATE Sensor SET status = 1 WHERE id = ?';
-            db.query(query, [id], (err, results) => {
+            db.query(query, [sensorId], (err, results) => {
                 if (err) {
-                    return res.status(400).send('Error turning on sensor: ' + err.message);
+                    return callback(err);
                 }
-                console.log(results);
-                req.mqttPublish('sensor_status', `{sensor_id: ${id}, status: "ON"}`)
-                res.status(200).json({ results });
+                mqttClient.publish('sensor_status', `{sensor_id: ${sensorId}, status: "ON"}`);
+                callback(null, results);
             });
         } catch (error) {
-            return res.status(400).send('Error turning on sensor: ' + error.message);
+            callback(error);
         }
     }
 
-    turnOffSensor(req, res) {
+    turnOffSensor(sensorId, callback) {
         try {
-            let id = req.params.id;
             const query = 'UPDATE Sensor SET status = 0 WHERE id = ?';
-            db.query(query, [id], (err, results) => {
+            db.query(query, [sensorId], (err, results) => {
                 if (err) {
-                    return res.status(400).send('Error turning off sensor: ' + err.message);
+                    return callback(err);
                 }
-                console.log(results);
-                req.mqttPublish('sensor_status', `{sensor_id: ${id}, status: "OFF"}`)
-                res.status(200).json({ results });
+                mqttClient.publish('sensor_status', `{sensor_id: ${sensorId}, status: "OFF"}`);
+                callback(null, results);
             });
         } catch (error) {
-            return res.status(400).send('Error turning off sensor: ' + error.message);
+            callback(error);
         }
     }
 
-    getNewestData(req, res) {
+    getNewestData(sensorId, callback) {
         try {
-            let id = req.params.id;
-            const query = 'SELECT * FROM History ORDER BY id DESC LIMIT 1 WHERE sensor_id = ?';
-            db.query(query, [id], (err, results) => {
+            const query = 'SELECT * FROM History WHERE sensor_id = ? ORDER BY id DESC LIMIT 1';
+            db.query(query, [sensorId], (err, results) => {
                 if (err) {
-                    return res.status(400).send('Error getting newest data: ' + err.message);
+                    return callback(err);
                 }
-                console.log(results);
-                res.status(200).json({ results });
+                callback(null, results);
             });
         } catch (error) {
-            return res.status(400).send('Error getting newest data: ' + error.message);
-        }     
+            callback(error);
+        }
     }
 
-    getHistoryData(req, res) {
+    getHistoryData(sensorId, callback) {
         try {
-            let id = req.params.id;
             const query = 'SELECT * FROM History WHERE sensor_id = ?';
-            db.query(query, [id], (err, results) => {
+            db.query(query, [sensorId], (err, results) => {
                 if (err) {
-                    return res.status(400).send('Error getting history data: ' + err.message);
+                    return callback(err);
                 }
-                console.log(results);
-                res.status(200).json({ results });
+                callback(null, results);
             });
         } catch (error) {
-            return res.status(400).send('Error getting history data: ' + error.message);
-        }     
+            callback(error);
+        }
     }
 
     testConnection(req, res) {
