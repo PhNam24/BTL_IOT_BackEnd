@@ -47,7 +47,6 @@ app.use((req, res, next) => {
   next();
 });
 
-<<<<<<< HEAD
 // Start server
 server.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
@@ -55,22 +54,6 @@ server.listen(port, () => {
     connect();
     message();
 });
-=======
-// Middleware
-app.use(bodyParser.json());
-app.use(
-  cor({
-    origin: true,
-    credentials: true,
-  })
-);
-app.use("/user", require("./routes/user"));
-app.use("/device", require("./routes/device"));
-app.use("/led", require("./routes/led"));
-app.use("/fan", require("./routes/fan"));
-app.use("/speaker", require("./routes/speaker"));
-app.use("/sensor", require("./routes/sensor"));
->>>>>>> b7a28a56d336563fab3ff93dc2cc032dbd34e5b7
 
 
 io.on("connection", (socket) => {
@@ -122,7 +105,6 @@ io.on("connection", (socket) => {
   });
 });
 
-<<<<<<< HEAD
 mqttClient.publish("led_state", `{led_id: 1, status: "on"}`, (err) => {
     if (err) {
         console.error('Failed to send message:', err);
@@ -130,9 +112,3 @@ mqttClient.publish("led_state", `{led_id: 1, status: "on"}`, (err) => {
         console.log(`Message sent to topic "led_state"`);
     }
 });
-=======
-// Start server
-server.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
->>>>>>> b7a28a56d336563fab3ff93dc2cc032dbd34e5b7
