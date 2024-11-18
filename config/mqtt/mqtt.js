@@ -1,22 +1,24 @@
 const mqtt = require('mqtt');
 const db = require('../db/mysql');
 
-const connectURL = 'wss://f0acd462864740079d29d753be0de1f2.s1.eu.hivemq.cloud:8884/mqtt';
+const connectURL = 'mqtt://e8faa1c0f8174e3db1d82dd501f86d7c.s1.eu.hivemq.cloud:8884/mqtt';
 const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
+
+console.log('clientId', clientId)
 
 const options = {
     clientId,
     clean: true,
-    protocol: 'mqtts',
-    username: 'btliot',
-    password: 'Btliotn3@'
+    protocol: 'wss',
+    username: 'wind2715',
+    password: '123456789Hanoi'
 };
 
 const client = mqtt.connect(connectURL, options);
-const topics = ['device', 'sensor', 'led', 'fan', 'speaker']
+const topics = ['device', 'sensor', 'led_state', 'fan', 'speaker']
 
 function connect() {
-    client.on('connect', () => {
+    client.on('connect', () => {   
         console.log('Connected to Mqtt Broker')
         topics.forEach((value, index) => {
             client.subscribe(`${value}`, (error) => {

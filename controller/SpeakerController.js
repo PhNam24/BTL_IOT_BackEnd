@@ -25,7 +25,7 @@ class SpeakerController {
                     return res.status(400).send('Error turning on speaker: ' + err.message);
                 }
                 console.log(results);
-                req.mqttPublish('speaker_status', `{speaker_id: ${id}, status: "ON"}`)
+                req.mqttPublish('speaker', `{speaker_id: ${id}, status: "ON"}`)
                 res.status(200).json({ results });
             });
         } catch (error) {
@@ -42,7 +42,7 @@ class SpeakerController {
                     return res.status(400).send('Error turning off speaker: ' + err.message);
                 }
                 console.log(results);
-                req.mqttPublish('speaker_status', `{speaker_id: ${id}, status: "OFF"}`)
+                req.mqttPublish('speaker', `{speaker_id: ${id}, status: "OFF"}`)
                 res.status(200).json({ results });
             });
         } catch (error) {

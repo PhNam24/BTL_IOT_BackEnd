@@ -24,7 +24,7 @@ class SensorController {
                 if (err) {
                     return callback(err);
                 }
-                mqttClient.publish('sensor_status', `{sensor_id: ${sensorId}, status: "ON"}`);
+                mqttClient.publish('sensor', `{sensor_id: ${sensorId}, status: "ON"}`);
                 callback(null, results);
             });
         } catch (error) {
@@ -39,7 +39,7 @@ class SensorController {
                 if (err) {
                     return callback(err);
                 }
-                mqttClient.publish('sensor_status', `{sensor_id: ${sensorId}, status: "OFF"}`);
+                mqttClient.publish('sensor', `{sensor_id: ${sensorId}, status: "OFF"}`);
                 callback(null, results);
             });
         } catch (error) {

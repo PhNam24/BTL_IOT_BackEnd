@@ -1,3 +1,4 @@
+const { json } = require('express');
 const db = require('../config/db/mysql');
 
 class UserController {
@@ -18,7 +19,7 @@ class UserController {
                 //     return res.status(400).send('Invalid credentials');
                 // }
                 // const token = jwt.sign({ userId: user.id }, 'secretkey', { expiresIn: '1h' });
-                res.status(200).json({ user });
+                res.status(200).json(user);
             });
         } catch (error) {
             res.status(400).send('Error logging in: ' + error.message);
@@ -34,7 +35,7 @@ class UserController {
                 if (err) {
                     return res.status(400).send('Error registering user: ' + err.message);
                 }
-                res.status(201).send('User registered successfully');
+                res.status(201).json({"message": 'User registered successfully', "id": result.insertId, "email": email, "name": name, "username": username, "attribute": "user"});
             });
         } catch (error) {
             res.status(400).send('Error registering user: ' + error.message);

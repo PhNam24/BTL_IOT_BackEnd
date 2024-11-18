@@ -10,9 +10,25 @@ const {client: mqttClient, connect, message} = require('./config/mqtt/mqtt');
 const app = express();
 const port = 3000;
 
-// Connect to mqtt broker
-connect();
-message();
+
+// Middleware
+app.use(bodyParser.json());
+app.use(cor(
+    {
+        origin: true,
+        credentials: true,
+    }
+));
+app.use("/user", require("./routes/user"));
+app.use("/device", require("./routes/device"));
+app.use("/led", require("./routes/led"));
+app.use("/fan", require("./routes/fan"));
+app.use("/speaker", require("./routes/speaker"));
+app.use("/sensor", require("./routes/sensor"));
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
 app.use((req, res, next) => {
     // Publish messages
     req.mqttPublish = function (topic, message) {
@@ -31,18 +47,14 @@ app.use((req, res, next) => {
     next()
 })
 
-// Middleware
-app.use(bodyParser.json());
-app.use(cor());
-app.use("/user", require("./routes/user"));
-app.use("/device", require("./routes/device"));
-app.use("/led", require("./routes/led"));
-app.use("/fan", require("./routes/fan"));
-app.use("/speaker", require("./routes/speaker"));
-app.use("/sensor", require("./routes/sensor"));
+// Start server
+server.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
+    // Connect to mqtt broker
+    connect();
+    message();
+});
 
-const server = http.createServer(app);
-const io = socketIo(server);
 
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -93,7 +105,10 @@ io.on('connection', (socket) => {
     });
 });
 
-// Start server
-server.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+mqttClient.publish("led_state", `{led_id: 1, status: "on"}`, (err) => {
+    if (err) {
+        console.error('Failed to send message:', err);
+    } else {
+        console.log(`Message sent to topic "led_state"`);
+    }
 });

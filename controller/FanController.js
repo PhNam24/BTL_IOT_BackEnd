@@ -25,7 +25,7 @@ class FanController {
                     return res.status(400).send('Error turning on fan: ' + err.message);
                 }
                 console.log(results);
-                req.mqttPublish('fan_status', `{fan_id: ${id}, status: "ON"}`)
+                req.mqttPublish('fan', `{fan_id: ${id}, status: "ON"}`)
                 res.status(200).json({ results });
             });
         } catch (error) {
@@ -42,7 +42,7 @@ class FanController {
                     return res.status(400).send('Error turning off fan: ' + err.message);
                 }
                 console.log(results);
-                req.mqttPublish('fan_status', `{fan_id: ${id}, status: "OFF"}`)
+                req.mqttPublish('fan', `{fan_id: ${id}, status: "OFF"}`)
                 res.status(200).json({ results });
             });
         } catch (error) {

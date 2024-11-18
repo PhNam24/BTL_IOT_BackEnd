@@ -24,8 +24,7 @@ class LedController {
                 if (err) {
                     return res.status(400).send('Error turning on led: ' + err.message);
                 }
-                console.log(results);
-                req.mqttPublish('led_status', `{led_id: ${id}, status: "ON"}`)
+                req.mqttPublish('led_state', `{led_id: ${id}, status: "on"}`)
                 res.status(200).json({ results });
             });
         } catch (error) {
@@ -41,8 +40,7 @@ class LedController {
                 if (err) {
                     return res.status(400).send('Error turning off led: ' + err.message);
                 }
-                console.log(results);
-                req.mqttPublish('led_status', `{led_id: ${id}, status: "OFF"}`)
+                req.mqttPublish('led_state', `{led_id: ${id}, status: "off"}`)
                 res.status(200).json({ results });
             });
         } catch (error) {
