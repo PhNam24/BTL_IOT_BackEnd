@@ -15,7 +15,7 @@ const options = {
 };
 
 const client = mqtt.connect(connectURL, options);
-const topics = ['device', 'sensor', 'led_state', 'fan', 'speaker']
+const topics = ['data', 'state']
 
 function connect() {
     client.on('connect', () => {   
@@ -42,14 +42,14 @@ function reconnect() {
 }
 
 function message() {
-    var query = "INSERT INTO History (humidity, temperature, timestamp, sensor_id) VALUES (?, ?, ?, ?)";
+    var query = "INSERT INTO History (humidity, temperature, timestamp, device_id) VALUES (?, ?, ?, ?)";
     
     client.on('message', (topic, payload) => {
         console.log('Received Message:', topic, payload.toString());
         try {
-            var json = JSON.parse(payload.toString());
-            if (topic == 'device') {
-                var sensor_id = json.sensorID.toString();
+            var json = JSON.parse(payload);
+            if (topic == 'esp8266_data') {
+                var sensor_id = json.deviceId.toString();
                 var humidity = json.humidity;
                 var temperature = json.temperature;
                 var time_update = new Date(); // Lấy thời gian hiện tại

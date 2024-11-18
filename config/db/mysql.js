@@ -3,7 +3,7 @@ const { createConnection } = require("mysql2");
 const db = createConnection({
   host: "localhost",
   user: "root",
-  password: "27092003",
+  password: "",
   database: "btl_iot",
 });
 

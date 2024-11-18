@@ -1,71 +1,81 @@
--- Tạo bảng User
+-- Sử dụng cơ sở dữ liệu btl_iot
+USE btl_iot;
+
+-- Bảng User
 CREATE TABLE User (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100),
-    username VARCHAR(50) UNIQUE NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    attribute VARCHAR(50) -- Lưu vai trò (admin/user)
+    name VARCHAR(100),
+    role VARCHAR(50) NOT NULL
 );
 
--- Tạo bảng Fan
-CREATE TABLE Fan (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    status INT
-);
-
--- Tạo bảng Speaker
-CREATE TABLE Speaker (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    status INT
-);
-
--- Tạo bảng Sensor
-CREATE TABLE Sensor (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    status INT
-);
-
--- Tạo bảng Led
-CREATE TABLE Led (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    des VARCHAR(255),
-    status INT,
-    led_brightness INT,
-    led_text_size INT
-);
-
--- Tạo bảng Device
+-- Bảng Device
 CREATE TABLE Device (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(50) PRIMARY KEY,
     user_id INT,
-    sensor_id INT,
-    fan_id INT,
-    speaker_id INT,
-    note VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES User(id),
-    FOREIGN KEY (sensor_id) REFERENCES Sensor(id),
-    FOREIGN KEY (fan_id) REFERENCES Fan(id),
-    FOREIGN KEY (speaker_id) REFERENCES Speaker(id)
+    sensor_status INT DEFAULT 0,
+    fan_status INT DEFAULT 0,
+    led_status INT DEFAULT 0,
+    led_brightness INT DEFAULT 7,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
 );
 
--- Tạo bảng History
-CREATE TABLE History (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    humidity FLOAT,
-    temperature FLOAT,
-    timestamp DATETIME,
-    sensor_id INT,
-    FOREIGN KEY (sensor_id) REFERENCES Sensor(id)
-);
-
--- Tạo bảng Setting
+-- Bảng Setting
 CREATE TABLE Setting (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    lower_humid FLOAT,
-    upper_humid FLOAT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    device_id VARCHAR(50),
     lower_temp FLOAT,
     upper_temp FLOAT,
-    device_id INT,
-    FOREIGN KEY (device_id) REFERENCES Device(id)
+    lower_humid FLOAT,
+    upper_humid FLOAT,
+    FOREIGN KEY (device_id) REFERENCES Device(id) ON DELETE CASCADE
 );
+
+-- Bảng History
+CREATE TABLE History (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    device_id VARCHAR(50),
+    temperature FLOAT,
+    humidity FLOAT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (device_id) REFERENCES Device(id) ON DELETE CASCADE
+);
+
+-- FAKE DATA
+INSERT INTO User (username, password, name, role)
+VALUES 
+    ('test1', '123456', 'test1', 'user'),
+    ('test2', '123456', 'test2', 'user');
+
+INSERT INTO Device (id, user_id, sensor_status, fan_status, led_status, led_brightness)
+VALUES 
+    ('1', 1, 0, 0, 0, 7);
+
+INSERT INTO Setting (device_id, lower_temp, upper_temp, lower_humid, upper_humid)
+VALUES 
+    (1, 10, 20, 10, 90);
+
+INSERT INTO History (device_id, temperature, humidity, timestamp)
+VALUES 
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 0 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 10 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 20 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 30 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 40 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 50 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 60 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 70 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 80 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 90 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 100 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 110 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 120 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 130 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 140 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 150 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 160 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 170 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 180 SECOND),
+    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 190 SECOND);
+
