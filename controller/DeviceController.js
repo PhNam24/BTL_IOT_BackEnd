@@ -1,3 +1,4 @@
+const { default: mqtt } = require('mqtt');
 const db = require('../config/db/mysql');
 
 class DeviceController {
@@ -30,25 +31,19 @@ class DeviceController {
         }
     }
 
-    // getDevicesByUserId(user_id) {
-    //     console.log("user_id:" + user_id);  
-    //     try {
-    //         const query = 'SELECT id, name, fan_status, led_status, led_brightness FROM Device WHERE user_id = ?';
-    //         db.query(query, [user_id], (err, results) => {
-    //             if (err) {
-    //                 console.log("err:" + err.message);
-    //                 return err.message;
-    //             }
-    //             console.log("results:" + results);
-    //             return results;
-    //         });
-    //     } catch (error) {
-    //         console.log("error:" + error.message);
-    //         return error.message;
-    //     }
-    //     console.log("lỗi");
-    //     return null;
-    // }
+    getDevices() {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT * FROM Device';
+            
+            db.query(query, [], (err, results) => {
+                if (err) {
+                    console.log("err:" + err.message);
+                    return reject('Error getting devices: ' + err.message);
+                }
+                resolve(results); // Trả về mảng các thiết bị
+            });
+        });
+    }
 
     getDevicesByUserId(user_id) {
         return new Promise((resolve, reject) => {
@@ -104,6 +99,7 @@ class DeviceController {
                 if (err) {
                     return res.status(400).send('Error manage device: ' + err.message);
                 }
+                req.mqttPublish('state', JSON.stringify({ deviceId: device_id, led_state: status, brightness: brightness }));
                 res.status(201).json({"message": 'Device manage successfully', "id": result.insertId, "user_id": user_id, "device_id": device_id, "status": status, "led_brightness": brightness});
             });
         } catch (err) {

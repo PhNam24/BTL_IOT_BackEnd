@@ -1,5 +1,6 @@
 const mqtt = require('mqtt');
 const db = require('../db/mysql');
+const { getDevices } = require('../../controller/DeviceController');
 
 const connectURL = 'mqtt://e8faa1c0f8174e3db1d82dd501f86d7c.s1.eu.hivemq.cloud:8884/mqtt';
 const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
@@ -18,7 +19,7 @@ const client = mqtt.connect(connectURL, options);
 const topics = ['data', 'state']
 
 function connect() {
-    client.on('connect', () => {   
+    client.on('connect', async () => {   
         console.log('Connected to Mqtt Broker')
         topics.forEach((value, index) => {
             client.subscribe(`${value}`, (error) => {
@@ -29,9 +30,18 @@ function connect() {
                 }
             })
         })
-    })
-    client.on('error', (error) => {
-        console.error('connection failed', error)
+
+        let devices = await getDevices();
+        for (const element of devices) {
+            client.publish('state', JSON.stringify({ deviceId: element.id, led_state: element.led_state, fan_state: element.fan_state, brightness: element.brightness }))
+            , (error) => {
+                console.error('Publish Failed', error)
+            }
+        }
+
+        client.on('error', (error) => {
+            console.error('connection failed', error)
+        })
     })
 }
 
@@ -48,10 +58,10 @@ function message() {
         console.log('Received Message:', topic, payload.toString());
         try {
             var json = JSON.parse(payload);
-            if (topic == 'esp8266_data') {
+            if (topic == 'data') {
                 var sensor_id = json.deviceId.toString();
-                var humidity = json.humidity;
-                var temperature = json.temperature;
+                var humidity = json.humid;
+                var temperature = json.temp;
                 var time_update = new Date(); // Lấy thời gian hiện tại
 
                 db.query(query, [humidity, temperature, time_update, sensor_id], function (err, result) {
