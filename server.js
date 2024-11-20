@@ -13,16 +13,21 @@ const port = 3000;
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: true,
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 app.use("/user", require("./routes/user"));
 app.use("/device", require("./routes/device"));
-// app.use("/history", require("./routes/history"));
 
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 app.use((req, res, next) => {
   // Publish messages
@@ -49,36 +54,54 @@ server.listen(port, () => {
   message();
 });
 
-// io.on("connection", (socket) => {
-//   console.log("a user connected");
+let deviceId = 1;
 
-//   // Lắng nghe sự kiện yêu cầu dữ liệu lịch sử từ client
-//   socket.on("requestHistory", async (data) => {
-//     const { user_id, device_id, page = 1, limit = 10 } = data;
+io.on("connection", (socket) => {
+  console.log("Client connected", socket.id);
 
-//     console.log(
-//       `Received requestHistory from user_id: ${user_id}, device_id: ${device_id}, page: ${page}, limit: ${limit}`
-//     );
+  // // Lắng nghe sự kiện yêu cầu dữ liệu lịch sử từ client
+  // socket.on("requestHistory", async (data) => {
+  //   const { user_id, device_id, page = 1, limit = 10 } = data;
 
-//     try {
-//       // Gọi hàm getData từ HistoryController
-//       const historyData = await HistoryController.getData(
-//         user_id,
-//         device_id,
-//         page,
-//         limit
-//       );
+  //   console.log(
+  //     `Received requestHistory from user_id: ${user_id}, device_id: ${device_id}, page: ${page}, limit: ${limit}`
+  //   );
 
-//       // Gửi dữ liệu về cho client
-//       socket.emit("receiveHistory", historyData);
-//     } catch (error) {
-//       console.error("Error fetching history data:", error);
-//       // Gửi lỗi về cho client
-//       socket.emit("historyError", error);
-//     }
-//   });
+  //   try {
+  //     // Gọi hàm getData từ HistoryController
+  //     const historyData = await HistoryController.getData(
+  //       user_id,
+  //       device_id,
+  //       page,
+  //       limit
+  //     );
 
-//   socket.on("disconnect", () => {
-//     console.log("user disconnected");
-//   });
-// });
+  //     // Gửi dữ liệu về cho client
+  //     socket.emit("receiveHistory", historyData);
+  //   } catch (error) {
+  //     console.error("Error fetching history data:", error);
+  //     // Gửi lỗi về cho client
+  //     socket.emit("historyError", error);
+  //   }
+  // });
+  mqttClient.on("message", (topic, message) => {
+    const json = JSON.parse(message);
+    if (topic === "data" && json.deviceId === deviceId) {
+      const object = { new_temp: json.temp, new_humid: json.humid };
+      console.log("Emit in data channel", object);
+      socket.emit("data", object);
+    }
+  });
+
+  socket.on("info", (data) => {
+    deviceId = data.device_id;
+  });
+
+  socket.on("mesage", (data) => {
+    console.log(data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
