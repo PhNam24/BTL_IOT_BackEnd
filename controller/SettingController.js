@@ -65,6 +65,7 @@ class SettingController {
       // Build the SET clause dynamically
       let fields = [];
       let values = [];
+
       if (lower_temp !== -1) {
         fields.push("lower_temp = ?");
         values.push(lower_temp);
@@ -92,7 +93,18 @@ class SettingController {
         if (err) {
           return res.status(400).send("Error updating setting: " + err.message);
         }
-        res.status(201).json("Setting updated successfully");
+        const setting = {
+          deviceId: device_id,
+          lower_temp: lower_temp !== -1 ? lower_temp : undefined,
+          upper_temp: upper_temp !== -1 ? upper_temp : undefined,
+          lower_humid: lower_humid !== -1 ? lower_humid : undefined,
+          upper_humid: upper_humid !== -1 ? upper_humid : undefined,
+        };
+
+        res.status(201).json({
+          message: "Setting updated successfully",
+          setting,
+        });
       });
     } catch (err) {
       return res.status(400).send("Error updating setting: " + err.message);

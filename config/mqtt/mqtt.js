@@ -36,7 +36,6 @@ function connect() {
     let devices = await getDevices();
     for (const element of devices) {
       let setting = await getSettingByDeviceId(element.id);
-      console.log(element);
 
       client.publish(
         "state",

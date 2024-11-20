@@ -1,93 +1,30 @@
 const db = require("../config/db/mysql");
 
 class HistoryController {
-  // Hàm hỗ trợ phân trang, trả về một Promise
-  getData(user_id, device_id, page = 1, limit = 10) {
-    return new Promise((resolve, reject) => {
-      const deviceQuery = "SELECT * FROM Device WHERE id = ?";
-      db.query(deviceQuery, [device_id], (err, results) => {
-        if (err) {
-          return reject("Error getting device by id: " + err.message);
-        }
-        const device = results[0];
-        if (!device) {
-          return reject("Device not found");
-        }
-        if (device.user_id !== user_id) {
-          return reject("Device unavailable for user");
-        }
+  async getHistory(req, res) {
+    const { device_id, user_id } = req.body;
 
-        const countQuery =
-          "SELECT COUNT(*) AS total FROM History WHERE device_id = ?";
-        db.query(countQuery, [device_id], (countErr, countResults) => {
-          if (countErr) {
-            return reject("Error getting history count: " + countErr.message);
-          }
-
-          const total = countResults[0].total;
-          const totalPages = Math.ceil(total / limit);
-          const offset = (page - 1) * limit;
-
-          const historyQuery =
-            "SELECT temperature, humidity, timestamp FROM History WHERE device_id = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?";
-          db.query(
-            historyQuery,
-            [device_id, limit, offset],
-            (historyErr, historyResults) => {
-              if (historyErr) {
-                return reject(
-                  "Error getting history data: " + historyErr.message
-                );
-              }
-
-              resolve({
-                page: page,
-                limit: limit,
-                totalRecords: total,
-                totalPages: totalPages,
-                data: historyResults,
-              });
-            }
-          );
-        });
-      });
-    });
-  }
-
-  // http get history
-  async getCurrentData(req, res) {
-    const { user_id, device_id } = req.body;
     try {
-      const deviceQuery = "SELECT * FROM Device WHERE id = ?";
-      db.query(deviceQuery, [device_id], (err, results) => {
+      const query =
+        "SELECT * FROM History WHERE device_id = ? AND device_id IN (SELECT id FROM device WHERE user_id = ?)";
+      db.query(query, [device_id, user_id], (err, result) => {
         if (err) {
-          res.status(400).send("Error getting device by id: " + err.message);
+          console.log(err);
+          return res.status(500).json({ message: "Internal server error" });
         }
-        console.log(results);
-        const device = results[0];
-        if (!device) {
-          res.status(404).send("Device not found");
-        }
-        if (device.user_id !== user_id) {
-          res.status(403).send("Device unavailable for user");
-        }
-        const historyQuery =
-          "SELECT temperature, humidity, timestamp FROM History WHERE device_id = ? ORDER BY timestamp DESC";
-        db.query(historyQuery, [device_id], (historyErr, historyResults) => {
-          if (historyErr) {
-            res
-              .status(400)
-              .send("Error getting history data: " + historyErr.message);
-          }
-          res.status(200).json({
-            user_id: user_id,
-            device_id: device_id,
-            historyResults: historyResults,
-          });
-        });
+        const data = result.map((item) => ({
+          id: item.id,
+          temp: item.temperature,
+          humid: item.humidity,
+          timestamp: item.timestamp,
+        }));
+
+        console.log(data);
+
+        res.status(200).json(data);
       });
     } catch (error) {
-      res.status(400).send("Error getting history: " + error);
+      return res.status(400).send(error);
     }
   }
 }
