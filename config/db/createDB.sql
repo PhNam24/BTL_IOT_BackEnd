@@ -7,7 +7,7 @@ CREATE TABLE User (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(100),
-    role VARCHAR(50) NOT NULL
+    email VARCHAR(100)
 );
 
 -- Bảng Device
@@ -15,10 +15,10 @@ CREATE TABLE Device (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255),
     user_id INT,
-    sensor_status INT DEFAULT 0,
     fan_status INT DEFAULT 0,
     led_status INT DEFAULT 0,
     led_brightness INT DEFAULT 7,
+    wa_status INT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
 );
 
@@ -44,39 +44,156 @@ CREATE TABLE History (
 );
 
 -- FAKE DATA
-INSERT INTO User (username, password, name, role)
-VALUES 
-    ('test1', '123456', 'test1', 'user'),
-    ('test2', '123456', 'test2', 'user');
+INSERT INTO
+    User (username, password, name, email)
+VALUES
+    ('test1', '123456', 'test1', 'test1@gmail.com'),
+    ('test2', '123456', 'test2', 'test2@gmail.com');
 
-INSERT INTO Device (id, user_id, sensor_status, fan_status, led_status, led_brightness)
-VALUES 
-    ('1', NodeMCU, 1, 0, 0, 0, 7);
+INSERT INTO
+    Device (
+        id,
+        name,
+        user_id,
+        fan_status,
+        led_status,
+        led_brightness,
+        wa_status,
+    )
+VALUES
+    ('1', 'NodeMCU', '1', '0', '0', '7', '0');
 
-INSERT INTO Setting (device_id, lower_temp, upper_temp, lower_humid, upper_humid)
-VALUES 
+INSERT INTO
+    Setting (
+        device_id,
+        lower_temp,
+        upper_temp,
+        lower_humid,
+        upper_humid
+    )
+VALUES
     (1, 10, 20, 10, 90);
 
-INSERT INTO History (device_id, temperature, humidity, timestamp)
-VALUES 
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 0 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 10 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 20 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 30 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 40 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 50 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 60 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 70 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 80 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 90 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 100 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 110 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 120 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 130 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 140 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 150 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 160 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 170 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 180 SECOND),
-    (1, ROUND(RAND() * 10 + 20, 2), ROUND(RAND() * 30 + 40, 2), NOW() - INTERVAL 190 SECOND);
-
+INSERT INTO
+    History (device_id, temperature, humidity, timestamp)
+VALUES
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 0 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 10 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 20 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 30 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 40 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 50 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 60 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 70 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 80 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 90 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 100 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 110 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 120 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 130 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 140 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 150 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 160 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 170 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 180 SECOND
+    ),
+    (
+        1,
+        ROUND(RAND() * 10 + 20, 2),
+        ROUND(RAND() * 30 + 40, 2),
+        NOW() - INTERVAL 190 SECOND
+    );
