@@ -13,6 +13,7 @@ CREATE TABLE User (
 -- Bảng Device
 CREATE TABLE Device (
     id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(255),
     user_id INT,
     sensor_status INT DEFAULT 0,
     fan_status INT DEFAULT 0,
@@ -50,7 +51,7 @@ VALUES
 
 INSERT INTO Device (id, user_id, sensor_status, fan_status, led_status, led_brightness)
 VALUES 
-    ('1', 1, 0, 0, 0, 7);
+    ('1', NodeMCU, 1, 0, 0, 0, 7);
 
 INSERT INTO Setting (device_id, lower_temp, upper_temp, lower_humid, upper_humid)
 VALUES 
