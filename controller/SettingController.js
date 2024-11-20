@@ -85,22 +85,14 @@ class SettingController {
         return res.status(400).send("No valid fields to update.");
       }
       values.push(user_id, device_id);
-      const query = `UPDATE Setting SET ${fields.join(
-        ", "
-      )} WHERE user_id = ? AND device_id = ?`;
+      const query = `UPDATE Setting 
+      SET ${fields.join(", ")} 
+      WHERE device_id IN (SELECT id FROM Device WHERE user_id = ?) AND device_id = ?`;
       db.query(query, values, (err, result) => {
         if (err) {
           return res.status(400).send("Error updating setting: " + err.message);
         }
-        res.status(201).json({
-          message: "Setting updated successfully",
-          user_id: user_id,
-          device_id: device_id,
-          lower_temp: lower_temp,
-          upper_temp: upper_temp,
-          lower_humid: lower_humid,
-          upper_humid: upper_humid,
-        });
+        res.status(201).json("Setting updated successfully");
       });
     } catch (err) {
       return res.status(400).send("Error updating setting: " + err.message);

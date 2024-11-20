@@ -1,6 +1,7 @@
 const mqtt = require("mqtt");
 const db = require("../db/mysql");
 const { getDevices } = require("../../controller/DeviceController");
+const { getSettingByDeviceId } = require("../../controller/SettingController");
 
 const connectURL =
   "mqtt://e8faa1c0f8174e3db1d82dd501f86d7c.s1.eu.hivemq.cloud:8884/mqtt";
@@ -17,7 +18,7 @@ const options = {
 };
 
 const client = mqtt.connect(connectURL, options);
-const topics = ["data", "state"];
+const topics = ["data", "state", "setting"];
 
 function connect() {
   client.on("connect", async () => {
@@ -34,23 +35,39 @@ function connect() {
 
     let devices = await getDevices();
     for (const element of devices) {
+      let setting = await getSettingByDeviceId(element.id);
+      console.log(element);
+
       client.publish(
         "state",
         JSON.stringify({
           deviceId: element.id,
-          led_state: element.led_state,
-          fan_state: element.fan_state,
-          brightness: element.brightness,
+          led_state: element.led_status,
+          fan_state: element.fan_status,
+          brightness: element.led_brightness,
         })
       ),
         (error) => {
           console.error("Publish Failed", error);
         };
-    }
+      client.publish(
+        "setting",
+        JSON.stringify({
+          deviceId: setting.device_id,
+          lower_temp: setting.lower_temp,
+          upper_temp: setting.upper_temp,
+          lower_humid: setting.lower_humid,
+          upper_humid: setting.upper_humid,
+        })
+      ),
+        (error) => {
+          console.error("Publish Failed", error);
+        };
 
-    client.on("error", (error) => {
-      console.error("connection failed", error);
-    });
+      client.on("error", (error) => {
+        console.error("connection failed", error);
+      });
+    }
   });
 }
 
