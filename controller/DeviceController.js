@@ -54,7 +54,7 @@ class DeviceController {
   getDevicesByUserId(user_id) {
     return new Promise((resolve, reject) => {
       const query =
-        "SELECT id, name, fan_status, led_status, led_brightness FROM Device WHERE user_id = ?";
+        "SELECT id, name, fan_status, led_status, wa_status, led_brightness FROM Device WHERE user_id = ?";
 
       db.query(query, [user_id], (err, results) => {
         if (err) {
@@ -111,38 +111,51 @@ class DeviceController {
   }
 
   async deviceManage(req, res) {
-    const name = req.params.device_name;
-    const { user_id, device_id, status, brightness } = req.body;
+    let name = req.params.device_name;
+    let { user_id, device_id, status } = req.body;
     try {
-      brightness = brightness === null ? 7 : brightness;
-      const query = `UPDATE Device SET ${name}_status = ?, led_brightness = ? WHERE user_id = ? AND id = ?`;
-      db.query(
-        query,
-        [status, brightness, user_id, device_id],
-        (err, result) => {
-          if (err) {
-            return res.status(400).send("Error manage device: " + err.message);
-          }
-          req.mqttPublish(
-            "state",
-            JSON.stringify({
-              deviceId: device_id,
-              led_state: status,
-              brightness: brightness,
-            })
-          );
-          res.status(201).json({
-            message: "Device manage successfully",
-            id: result.insertId,
-            user_id: user_id,
-            device_id: device_id,
-            status: status,
-            led_brightness: brightness,
-          });
+      let query = `UPDATE Device SET ${name}_status = ? WHERE user_id = ? AND id = ?`;
+      db.query(query, [status, user_id, device_id], (err, result) => {
+        if (err) {
+          return res.status(400).send("Error manage device: " + err.message);
         }
-      );
+        // let deviceState = `${name}_state`;
+        // req.mqttPublish(
+        //   "state",
+        //   JSON.stringify({
+        //     deviceId: device_id,
+        //     [deviceState]: status,
+        //     brightness: brightness,
+        //   })
+        // );
+        res.status(201).json("Device manage successfully");
+      });
     } catch (err) {
       return res.status(400).send("Error manage device: " + err.message);
+    }
+  }
+
+  async brightnessManage(req, res) {
+    let { user_id, device_id, brightness } = req.body;
+    try {
+      let query = `UPDATE Device SET led_brightness = ? WHERE user_id = ? AND id = ?`;
+      db.query(query, [brightness, user_id, device_id], (err, result) => {
+        if (err) {
+          return res
+            .status(400)
+            .send("Error manage brightness: " + err.message);
+        }
+        // req.mqttPublish(
+        //   "state",
+        //   JSON.stringify({
+        //     deviceId: device_id,
+        //     brightness: brightness,
+        //   })
+        // );
+        res.status(201).json("Brightness manage successfully");
+      });
+    } catch (err) {
+      return res.status(400).send("Error manage brightness: " + err.message);
     }
   }
 }

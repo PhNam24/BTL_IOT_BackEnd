@@ -33,6 +33,7 @@ class UserController {
               fanStatus: element.fan_status,
               ledStatus: element.led_status,
               ledBrightness: element.led_brightness,
+              waStatus: element.wa_status,
               lowerTemp: setting.lower_temp,
               upperTemp: setting.upper_temp,
               lowerHumid: setting.lower_humid,

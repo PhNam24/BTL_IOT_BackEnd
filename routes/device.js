@@ -5,6 +5,7 @@ const {
   addNewDevice,
   deleteDevice,
   deviceManage,
+  brightnessManage,
 } = require("../controller/DeviceController");
 const {
   addNewSetting,
@@ -20,6 +21,7 @@ router.post("/history", getHistory);
 router.post("/add", addNewDevice);
 router.delete("/delete/:name", deleteDevice);
 router.post("/:device_name", deviceManage);
+router.post("/brightness", brightnessManage);
 router.post("/setting", addNewSetting);
 router.put("/setting", updateSetting);
 
