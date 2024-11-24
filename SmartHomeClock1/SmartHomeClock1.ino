@@ -22,7 +22,8 @@
 #define DHTTYPE DHT11
 DHT_Unified dht(DHTPIN, DHTTYPE);
 #define mqtt_topic_pub "sensor"
-#define mqtt_topic_sub "state"
+#define mqtt_topic_sub_1 "state"
+#define mqtt_topic_sub_2 "setting"
 #define FAN_PIN D1
 #define WA_PIN D2
 DHTesp mqttDht;
@@ -31,8 +32,8 @@ auto timer = timer_create_default();  // create a timer with default settings
 // =======================================================================
 // Connection data:
 // =======================================================================
-const char* ssid = "Tiny Post Cafe";                     // SSID
-const char* password = "12345678";                       // PASSWORD
+const char* ssid = "iPhone";                     // SSID
+const char* password = "a8b8c8d8";                       // PASSWORD
 String weatherKey = "3d6ad3a84d72217748a659d271bf5dee";  // openweathermap API http://o...content-available-to-author-only...p.org/api
 String weatherLang = "&lang=en";
 String cityID = "1581130";  //Chaweng (Ban Thung)
@@ -131,7 +132,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) incommingMessage += (char)payload[i];
 
   Serial.println("Message arrived [" + String(topic) + "]" + incommingMessage);
-  if (strcmp(topic, mqtt_topic_sub) == 0) {
+  if (strcmp(topic, mqtt_topic_sub_1) == 0) {
     DynamicJsonDocument doc(1024);
     DeserializationError error = deserializeJson(doc, incommingMessage);
     if (error) {
@@ -278,12 +279,12 @@ void loop() {
     lastMsg = now;
     DynamicJsonDocument doc(1024);
     doc["deviceId"] = 1;
-    doc["siteId"] = "23's Lab IOT";
-    doc["humidity"] = humidity;
-    doc["temperature"] = temperature;
+    // doc["siteId"] = "23's Lab IOT";
+    doc["humid"] = humidity;
+    doc["temp"] = temperature;
     char mqtt_message[256];
     serializeJson(doc, mqtt_message);
-    publishMessage("esp8266_data", mqtt_message, true);
+    publishMessage("data", mqtt_message, true);
   }
   if (updCnt <= 0) {
     updCnt = 5;  // 10

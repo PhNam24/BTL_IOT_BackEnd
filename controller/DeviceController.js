@@ -1,4 +1,4 @@
-const { default: mqtt } = require("mqtt");
+const { client } = require("../config/mqtt/mqtt");
 const db = require("../config/db/mysql");
 
 class DeviceController {
@@ -120,13 +120,11 @@ class DeviceController {
           return res.status(400).send("Error manage device: " + err.message);
         }
         // let deviceState = `${name}_state`;
-        // req.mqttPublish(
+        // client.publish(
         //   "state",
-        //   JSON.stringify({
-        //     deviceId: device_id,
-        //     [deviceState]: status,
-        //     brightness: brightness,
-        //   })
+        //   `deviceId: device_id,
+        //   ${deviceState}: status
+        //   `
         // );
         res.status(201).json("Device manage successfully");
       });

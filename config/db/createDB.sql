@@ -26,10 +26,10 @@ CREATE TABLE Device (
 CREATE TABLE Setting (
     id INT AUTO_INCREMENT PRIMARY KEY,
     device_id VARCHAR(50),
-    lower_temp FLOAT,
-    upper_temp FLOAT,
-    lower_humid FLOAT,
-    upper_humid FLOAT,
+    lower_temp FLOAT DEFAULT 10,
+    upper_temp FLOAT DEFAULT 35,
+    lower_humid FLOAT DEFAULT 40,
+    upper_humid FLOAT DEFAULT 85,
     FOREIGN KEY (device_id) REFERENCES Device(id) ON DELETE CASCADE
 );
 
